@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 
@@ -12,6 +12,8 @@ const UserSignIn = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = (location.state as { redirectTo?: string })?.redirectTo || "/";
 
   // Email validation function
   const validateEmail = (email: string): boolean => {
@@ -66,7 +68,7 @@ const UserSignIn = () => {
       localStorage.setItem("userLoggedIn", "true");
       localStorage.setItem("userEmail", formData.email);
       localStorage.setItem("loggedInUser", user.name);
-      navigate("/");
+      navigate(redirectTo);
       setLoading(false);
     }, 1500);
   };

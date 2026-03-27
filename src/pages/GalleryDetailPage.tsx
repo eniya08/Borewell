@@ -15,66 +15,45 @@ interface GalleryItem {
 }
 
 const galleryItems: GalleryItem[] = [
-  {
-    id: 1,
-    src: "https://images.unsplash.com/photo-1581092160562-40fed08a5407?w=600&h=400&fit=crop",
-    alt: "Drilling rig equipment",
-    category: "Heavy Equipment",
-    title: "Advanced Drilling Rig",
-    description: "Our state-of-the-art drilling equipment capable of reaching up to 1500 feet deep.",
-    views: 234,
-    likes: 45,
-  },
-  {
-    id: 2,
-    src: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=600&h=400&fit=crop",
-    alt: "Drilling team at work",
-    category: "Team Work",
-    title: "Expert Drilling Team",
-    description: "Our skilled team performing professional borewell drilling operations.",
-    views: 189,
-    likes: 38,
-  },
-  {
-    id: 3,
-    src: "https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=600&h=400&fit=crop",
-    alt: "Water construction",
-    category: "Projects",
-    title: "Water Well Construction",
-    description: "Completed borewell project with professional casing and installation.",
-    views: 312,
-    likes: 67,
-  },
-  {
-    id: 4,
-    src: "https://images.unsplash.com/photo-1581092924270-8cbaeea4d4e9?w=600&h=400&fit=crop",
-    alt: "Pump installation",
-    category: "Installation",
-    title: "Submersible Pump Setup",
-    description: "Professional pump installation with complete electrical setup.",
-    views: 156,
-    likes: 29,
-  },
-  {
-    id: 5,
-    src: "https://images.unsplash.com/photo-1581092915962-8706672e5b5f?w=600&h=400&fit=crop",
-    alt: "Maintenance work",
-    category: "Maintenance",
-    title: "System Maintenance",
-    description: "Regular maintenance ensuring optimal borewell performance.",
-    views: 203,
-    likes: 41,
-  },
-  {
-    id: 6,
-    src: "https://images.unsplash.com/photo-1581092941395-60ae96f88bd8?w=600&h=400&fit=crop",
-    alt: "Site preparation",
-    category: "Projects",
-    title: "Site Preparation",
-    description: "Initial site assessment and preparation for borewell drilling.",
-    views: 278,
-    likes: 53,
-  },
+  // Heavy Equipment
+  { id: 1, category: "Heavy Equipment", src: "/gallery/heavy_equipment_1_1774545694793.png", alt: "Borewell drilling machines", title: "Heavy Truck Rig", description: "Borewell drilling machines operating in rural setting.", views: 342, likes: 89 },
+  { id: 2, category: "Heavy Equipment", src: "https://images.unsplash.com/photo-1581092162384-8987c1d64718?w=800&h=600&fit=crop", alt: "Hydraulic drilling rigs", title: "Hydraulic Equipment", description: "Advanced hydraulic drilling rig at work.", views: 251, likes: 64 },
+  { id: 3, category: "Heavy Equipment", src: "https://images.unsplash.com/photo-1621689037042-832145da556d?w=800&h=600&fit=crop", alt: "Truck mounted borewell rigs", title: "Truck Mounted Rig", description: "Heavy duty truck mounted drilling rig.", views: 421, likes: 95 },
+  { id: 4, category: "Heavy Equipment", src: "https://images.unsplash.com/photo-1541888081182-356b4f620bd2?w=800&h=600&fit=crop", alt: "Compressor machines", title: "Air Compressors", description: "High capacity air compressors for flushing.", views: 189, likes: 45 },
+  { id: 5, category: "Heavy Equipment", src: "https://images.unsplash.com/photo-1581092511106-c0eb6c1f8c9e?w=800&h=600&fit=crop", alt: "Drilling pipes and tools", title: "Drilling Pipes", description: "Heavy industrial drilling pipes and machinery.", views: 290, likes: 72 },
+  { id: 6, category: "Heavy Equipment", src: "https://images.unsplash.com/photo-1516216628859-9bccecab13ca?w=800&h=600&fit=crop", alt: "Heavy machinery on site", title: "Excavation Tools", description: "Specialized tools for hard rock drilling.", views: 334, likes: 81 },
+
+  // Team Work
+  { id: 7, category: "Team Work", src: "/gallery/team_work_1_1774545712844.png", alt: "Workers operating borewell machines", title: "Safety Crew", description: "Team planning drilling location outdoors.", views: 405, likes: 112 },
+  { id: 8, category: "Team Work", src: "https://images.unsplash.com/photo-1531834685032-c34bf0d84c77?w=800&h=600&fit=crop", alt: "Team planning drilling location", title: "Site Planning", description: "Engineers inspecting borewell site.", views: 276, likes: 58 },
+  { id: 9, category: "Team Work", src: "https://images.unsplash.com/photo-1581092916564-8241b3d76b00?w=800&h=600&fit=crop", alt: "Engineers inspecting site", title: "Engineering Inspection", description: "Thorough inspection of groundwater points.", views: 342, likes: 88 },
+  { id: 10, category: "Team Work", src: "https://images.unsplash.com/photo-1508344928928-76ad0b16f281?w=800&h=600&fit=crop", alt: "Safety gear usage", title: "Safety First", description: "Workers equipped with safety uniforms.", views: 201, likes: 49 },
+  { id: 11, category: "Team Work", src: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop", alt: "Engineers discussing blueprints", title: "Blueprint Analysis", description: "Analyzing geological data for drilling.", views: 310, likes: 76 },
+  { id: 12, category: "Team Work", src: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800&h=600&fit=crop", alt: "Coordinating placement", title: "Crew Coordination", description: "Coordinating the rig placement perfectly.", views: 250, likes: 62 },
+
+  // Projects
+  { id: 13, category: "Projects", src: "/gallery/projects_1_1774545736054.png", alt: "Completed borewell sites", title: "Agricultural Borewell", description: "Rural agricultural borewell yielding high water pressure.", views: 512, likes: 140 },
+  { id: 14, category: "Projects", src: "https://images.unsplash.com/photo-1584485590518-a627bd3c224b?w=800&h=600&fit=crop", alt: "Rural projects", title: "Rural Project", description: "Completed rural groundwater well.", views: 290, likes: 65 },
+  { id: 15, category: "Projects", src: "https://images.unsplash.com/photo-1581092160562-40fed08a5407?w=800&h=600&fit=crop", alt: "Water flow testing", title: "Yield Testing", description: "Successful water flow testing post-drilling.", views: 421, likes: 92 },
+  { id: 16, category: "Projects", src: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&h=600&fit=crop", alt: "Customer handover moments", title: "Commercial Well", description: "Installed commercial grade well point.", views: 315, likes: 77 },
+  { id: 17, category: "Projects", src: "https://images.unsplash.com/photo-1513828742140-ccaa28f3eda0?w=800&h=600&fit=crop", alt: "Farm irrigation", title: "Farm Irrigation", description: "Farm irrigation setup connected to borewell.", views: 388, likes: 88 },
+  { id: 18, category: "Projects", src: "https://images.unsplash.com/photo-1457195740896-1c0b380fe7df?w=800&h=600&fit=crop", alt: "Pumping fresh water", title: "Pure Water Extraction", description: "Crystal clear water extraction system.", views: 450, likes: 105 },
+
+  // Installation
+  { id: 19, category: "Installation", src: "/gallery/installation_1_1774545785179.png", alt: "Submersible motor installation", title: "Motor Installation", description: "Workers installing a heavy submersible motor.", views: 280, likes: 63 },
+  { id: 20, category: "Installation", src: "https://images.unsplash.com/photo-1581092518469-80fb78dbe0fc?w=800&h=600&fit=crop", alt: "Pipe installation inside borewell", title: "Drop Pipes", description: "Lowering uPVC delivery pipes.", views: 215, likes: 44 },
+  { id: 21, category: "Installation", src: "https://images.unsplash.com/photo-1558222218-b7b54eede3f3?w=800&h=600&fit=crop", alt: "Electrical panel setup", title: "Starter Panel", description: "Safe and secure electrical panel wiring.", views: 195, likes: 38 },
+  { id: 22, category: "Installation", src: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop", alt: "Pump fitting", title: "Pump Assembly", description: "Expert submersible pump fitting details.", views: 320, likes: 85 },
+  { id: 23, category: "Installation", src: "https://images.unsplash.com/photo-1581092162590-0b6dc0f8ab88?w=800&h=600&fit=crop", alt: "Casing pipes", title: "Casing Installation", description: "High durability casing pipe dropping.", views: 260, likes: 55 },
+  { id: 24, category: "Installation", src: "https://images.unsplash.com/photo-1533575770077-052fa2c609fc?w=800&h=600&fit=crop", alt: "Cables", title: "Waterproof Cabling", description: "Submersible heavily insulated cables.", views: 180, likes: 40 },
+
+  // Maintenance
+  { id: 25, category: "Maintenance", src: "/gallery/maintenance_1_1774545805461.png", alt: "Borewell flushing work", title: "High Pressure Flushing", description: "Air flushing removing silt and mud.", views: 442, likes: 95 },
+  { id: 26, category: "Maintenance", src: "https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?w=800&h=600&fit=crop", alt: "Motor repair service", title: "Motor Repair", description: "Rewinding and repairing burnt motors.", views: 230, likes: 51 },
+  { id: 27, category: "Maintenance", src: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&h=600&fit=crop", alt: "Pipe cleaning", title: "Pipeline Clearing", description: "Clearing blockages in water extraction.", views: 285, likes: 62 },
+  { id: 28, category: "Maintenance", src: "https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=800&h=600&fit=crop", alt: "Technician", title: "Expert Diagnostics", description: "Diagnosing yield and electrical faults.", views: 305, likes: 74 },
+  { id: 29, category: "Maintenance", src: "https://images.unsplash.com/photo-1581092163190-6dae1b82776c?w=800&h=600&fit=crop", alt: "Checking electricals", title: "Voltage Check", description: "Ensuring stable phases for smooth pump run.", views: 198, likes: 42 },
+  { id: 30, category: "Maintenance", src: "https://images.unsplash.com/photo-1581092334543-7f280a9fc6c5?w=800&h=600&fit=crop", alt: "System overhaul", title: "System Overhaul", description: "Complete system testing and revival.", views: 355, likes: 88 }
 ];
 
 const categories = ["All", ...new Set(galleryItems.map((item) => item.category))];

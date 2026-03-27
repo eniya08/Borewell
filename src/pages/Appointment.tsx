@@ -10,6 +10,8 @@ interface AppointmentFormData {
   serviceType: string;
   date: string;
   description: string;
+  location: string;
+  depth: string;
 }
 
 const Appointment = () => {
@@ -24,6 +26,8 @@ const Appointment = () => {
     serviceType: 'Borewell Drilling',
     date: '',
     description: '',
+    location: '',
+    depth: '',
   });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -116,7 +120,7 @@ const Appointment = () => {
       return;
     }
     
-    if (!formData.name || !formData.email || !formData.phone || !formData.date) {
+    if (!formData.name || !formData.email || !formData.phone || !formData.date || !formData.location) {
       alert('Please fill all required fields');
       return;
     }
@@ -137,7 +141,8 @@ const Appointment = () => {
         serviceType: formData.serviceType,
         date: formData.date,
         description: formData.description,
-        location: '',
+        location: formData.location,
+        depth: formData.depth,
         status: 'pending',
         submittedAt: new Date().toLocaleString(),
         submittedDate: new Date().toISOString()
@@ -268,6 +273,37 @@ const Appointment = () => {
                 className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:outline-none"
                 required
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Location */}
+              <div className="space-y-2">
+                <label htmlFor="location" className="text-sm font-medium text-foreground">Location *</label>
+                <input 
+                  type="text" 
+                  id="location"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:outline-none"
+                  placeholder="Service address"
+                  required
+                />
+              </div>
+
+              {/* Depth */}
+              <div className="space-y-2">
+                <label htmlFor="depth" className="text-sm font-medium text-foreground">Depth (if provided)</label>
+                <input 
+                  type="text" 
+                  id="depth"
+                  name="depth"
+                  value={formData.depth}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary focus:outline-none"
+                  placeholder="e.g. 500ft"
+                />
+              </div>
             </div>
 
             {/* Additional Details */}

@@ -1,21 +1,27 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Calendar, User, Share2 } from "lucide-react";
+import { blogsAPI } from "@/lib/api";
 
 interface BlogPost {
-  id: number;
+  _id?: string;
+  id?: number;
   title: string;
   excerpt: string;
   content: string;
-  author: string;
-  date: string;
-  category: string;
+  author?: { name: string } | string;
+  date?: string;
+  createdAt?: string;
+  category?: string;
   image: string;
-  readTime: number;
+  readTime?: number;
+  slug?: string;
+  views?: number;
 }
 
-const blogPosts: BlogPost[] = [
+// Default fallback posts if API is unavailable
+const defaultBlogPosts: BlogPost[] = [
   {
     id: 1,
     title: "The Complete Guide to Borewell Drilling",
@@ -60,74 +66,57 @@ const blogPosts: BlogPost[] = [
     image: "https://images.unsplash.com/photo-1513828583688-c52646db42da?w=800&h=500&fit=crop&q=80",
     readTime: 5,
   },
-  {
-    id: 5,
-    title: "Seasonal Borewell Maintenance Checklist",
-    excerpt: "Keep your borewell in peak condition with our seasonal maintenance guide.",
-    content: "Seasonal changes require different maintenance approaches for your borewell. Discover our comprehensive checklist covering pre-monsoon preparations, post-monsoon inspections, and winter maintenance tips to ensure year-round reliability.",
-    author: "Maintenance Team",
-    date: "2024-03-05",
-    category: "Maintenance",
-    image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&h=500&fit=crop&q=80",
-    readTime: 4,
-  },
-  {
-    id: 6,
-    title: "Troubleshooting Common Borewell Problems",
-    excerpt: "Quick solutions for low water pressure, pump failures, and other issues.",
-    content: "Experiencing issues with your borewell? This guide covers the most common problems including low water pressure, pump failures, water quality issues, and electrical problems with practical troubleshooting steps and when to call professionals.",
-    author: "Support Team",
-    date: "2024-02-28",
-    category: "Guide",
-    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=500&fit=crop&q=80",
-    readTime: 5,
-  },
-  {
-    id: 7,
-    title: "Cost Analysis: Investing in a Borewell",
-    excerpt: "Understanding expenses and long-term savings of borewell systems.",
-    content: "Planning a borewell? Learn about drilling costs, equipment expenses, maintenance requirements, and long-term savings. Our transparent cost analysis helps you make informed investment decisions for your water supply needs.",
-    author: "Finance Team",
-    date: "2024-02-25",
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1579621970563-430f63602022?w=800&h=500&fit=crop&q=80",
-    readTime: 6,
-  },
-  {
-    id: 8,
-    title: "Environmental Impact of Borewell Drilling",
-    excerpt: "Responsible drilling practices for sustainable water extraction.",
-    content: "Learn about the environmental considerations in borewell drilling, sustainable water management practices, and how responsible drilling helps preserve groundwater resources for future generations.",
-    author: "Environmental Consultant",
-    date: "2024-02-20",
-    category: "Maintenance",
-    image: "https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=800&h=500&fit=crop&q=80",
-    readTime: 5,
-  },
-  {
-    id: 9,
-    title: "Selecting the Right Borewell Depth",
-    excerpt: "How geological surveys determine optimal drilling depth.",
-    content: "The depth of your borewell significantly impacts water yield and cost. Understand how geological surveys, water table analysis, and soil composition help determine the ideal drilling depth for your specific location.",
-    author: "Geological Expert",
-    date: "2024-02-15",
-    category: "Guide",
-    image: "https://images.unsplash.com/photo-1581092160562-40fed08a5407?w=800&h=500&fit=crop&q=80",
-    readTime: 5,
-  },
 ];
-
-const categories = ["All", ...new Set(blogPosts.map((p) => p.category))];
 
 const BlogPage = () => {
   const navigate = useNavigate();
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(defaultBlogPosts);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+
+  useEffect(() => {
+    fetchBlogPosts();
+  }, []);
+
+  const fetchBlogPosts = async () => {
+    try {
+      setLoading(true);
+      const posts = await blogsAPI.getAll();
+      if (posts && posts.length > 0) {
+        setBlogPosts(posts);
+      } else {
+        setBlogPosts(defaultBlogPosts);
+      }
+    } catch (error) {
+      console.error("Failed to fetch blog posts:", error);
+      // Use default posts on error
+      setBlogPosts(defaultBlogPosts);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const categories = ["All", ...new Set(blogPosts.map((p) => p.category).filter(Boolean))];
 
   const filteredPosts =
     selectedCategory === "All"
       ? blogPosts
       : blogPosts.filter((p) => p.category === selectedCategory);
+
+  // Helper to get author name
+  const getAuthorName = (author: any) => {
+    if (typeof author === "string") return author;
+    if (author?.name) return author.name;
+    return "Unknown Author";
+  };
+
+  // Helper to get date string
+  const getDateString = (post: BlogPost) => {
+    const dateStr = post.date || post.createdAt;
+    if (!dateStr) return "N/A";
+    return new Date(dateStr).toLocaleDateString();
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-24">
@@ -186,10 +175,14 @@ const BlogPage = () => {
           layout
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full"
         >
-          {filteredPosts.length > 0 ? (
+          {loading ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-400 text-lg">Loading blog posts...</p>
+            </div>
+          ) : filteredPosts.length > 0 ? (
             filteredPosts.map((post, i) => (
               <motion.article
-                key={post.id}
+                key={post._id || post.id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -211,7 +204,7 @@ const BlogPage = () => {
                   />
                   <div className="absolute top-3 left-3">
                     <span className="px-3 py-1 bg-[#FF9900] text-white text-xs font-bold rounded-full">
-                      {post.category}
+                      {post.category || "General"}
                     </span>
                   </div>
                 </div>
@@ -228,15 +221,15 @@ const BlogPage = () => {
                     <div className="flex items-center justify-between text-xs text-gray-400">
                       <div className="flex items-center gap-2">
                         <User size={14} />
-                        <span className="truncate">{post.author}</span>
+                        <span className="truncate">{getAuthorName(post.author)}</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400">
                       <div className="flex items-center gap-2">
                         <Calendar size={14} />
-                        {new Date(post.date).toLocaleDateString()}
+                        {getDateString(post)}
                       </div>
-                      <p className="text-[#FF9900] font-semibold">{post.readTime} min</p>
+                      {post.readTime && <p className="text-[#FF9900] font-semibold">{post.readTime} min</p>}
                     </div>
                   </div>
                 </div>
@@ -284,7 +277,7 @@ const BlogPage = () => {
               {/* Category & Meta */}
               <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/10">
                 <span className="px-3 py-1 bg-[#FF9900]/30 text-[#FF9900] rounded-full text-sm font-semibold">
-                  {selectedPost.category}
+                  {selectedPost.category || "General"}
                 </span>
                 <button
                   onClick={() => setSelectedPost(null)}
@@ -300,13 +293,13 @@ const BlogPage = () => {
               <div className="flex items-center gap-6 text-sm text-gray-400 mb-6">
                 <div className="flex items-center gap-2">
                   <User size={16} />
-                  {selectedPost.author}
+                  {getAuthorName(selectedPost.author)}
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar size={16} />
-                  {new Date(selectedPost.date).toLocaleDateString()}
+                  {getDateString(selectedPost)}
                 </div>
-                <span>{selectedPost.readTime} min read</span>
+                {selectedPost.readTime && <span>{selectedPost.readTime} min read</span>}
               </div>
 
               {/* Content */}

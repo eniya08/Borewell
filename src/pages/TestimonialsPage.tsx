@@ -96,7 +96,7 @@ const TestimonialsPage = () => {
           <div className="w-16 h-16 mx-auto mb-4 bg-purple-500/30 rounded-full flex items-center justify-center">
             <MessageSquare className="w-8 h-8 text-purple-400" />
           </div>
-          <h1 className="text-5xl font-bold text-white mb-4">Customer Testimonials</h1>
+          <h1 className="text-5xl font-bold text-white mb-4">Customer Reviews</h1>
           <p className="text-gray-300 text-lg">
             Hear from our satisfied customers about their experience with us
           </p>
@@ -129,7 +129,7 @@ const TestimonialsPage = () => {
         </div>
       </motion.section>
 
-      {/* Testimonials Grid */}
+      {/* Reviews Grid */}
       <div className="max-w-6xl mx-auto px-4 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial, i) => (

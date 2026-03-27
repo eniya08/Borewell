@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User, Phone } from "lucide-react";
 
@@ -16,6 +16,8 @@ const UserSignUp = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = (location.state as { redirectTo?: string })?.redirectTo || "/";
 
   // Email validation function
   const validateEmail = (email: string): boolean => {
@@ -73,34 +75,42 @@ const UserSignUp = () => {
       return;
     }
 
-    // Check if email already exists
-    const existingUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
-    if (existingUsers.some((user: any) => user.email === formData.email)) {
-      setError("Email already registered. Please sign in instead.");
-      setLoading(false);
-      return;
-    }
+    try {
+      // Save user to localStorage — no backend needed
+      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]");
 
-    // Simulate API call
-    setTimeout(() => {
-      // Store registered user with password
+      // Check if email already exists
+      const emailExists = registeredUsers.some((u: { email: string }) => u.email === formData.email);
+      if (emailExists) {
+        setError("This email is already registered. Please sign in instead.");
+        setLoading(false);
+        return;
+      }
+
+      // Add new user
       const newUser = {
+        id: Date.now().toString(),
         name: formData.fullName,
         email: formData.email,
         phone: formData.phone,
-        password: formData.password, // In production, this should be hashed!
+        password: formData.password,
+        createdAt: new Date().toISOString(),
       };
+      registeredUsers.push(newUser);
+      localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
 
-      existingUsers.push(newUser);
-      localStorage.setItem("registeredUsers", JSON.stringify(existingUsers));
-
-      // Auto-login after signup
+      // Auto-login after registration
       localStorage.setItem("userLoggedIn", "true");
       localStorage.setItem("userEmail", formData.email);
       localStorage.setItem("loggedInUser", formData.fullName);
-      navigate("/");
+      localStorage.setItem("userId", newUser.id);
+
+      navigate(redirectTo);
+    } catch (err) {
+      setError("Registration failed. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (

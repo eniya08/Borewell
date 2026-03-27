@@ -12,25 +12,15 @@ const borewellItems = [
   { label: "Maintenance Services", href: "/service/maintenance" },
 ];
 
-const galleryItems = [
-  { label: "Project Gallery", href: "/gallery-detail" },
-  { label: "Work Sites", href: "/gallery-detail" },
-  { label: "Equipment", href: "/gallery-detail" },
-];
 
-const moreItems = [
-  { label: "Blog", href: "/blog" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Testimonials", href: "/testimonials" },
-];
 
 const navLinks = [
   { label: "HOME", href: "/" },
-  { label: "ABOUT US", href: "/about" },
-  { label: "BOREWELL", href: "/services", hasDropdown: true, dropdownItems: borewellItems },
-  { label: "UPDATES", href: "/projects" },
-  { label: "GALLERY", href: "/gallery", hasDropdown: true, dropdownItems: galleryItems },
-  { label: "MORE", href: "#", hasDropdown: true, dropdownItems: moreItems },
+  { label: "ABOUT", href: "/about" },
+  { label: "SERVICES", href: "/services", hasDropdown: true, dropdownItems: borewellItems },
+  { label: "ESTIMATOR", href: "/estimator" },
+
+  { label: "REVIEWS", href: "/testimonials" },
   { label: "CONTACT", href: "/contact" },
 ];
 
@@ -216,6 +206,19 @@ const Navbar = () => {
                           <p className="text-white text-sm font-semibold">Welcome!</p>
                           <p className="text-[#FF9900] text-xs">{userName}</p>
                         </div>
+                        
+                        <motion.button
+                          whileHover={{ backgroundColor: "rgba(255, 153, 0, 0.2)" }}
+                          onClick={() => {
+                            setShowProfileMenu(false);
+                            navigate("/profile");
+                          }}
+                          className="w-full px-4 py-3 text-left flex items-center gap-2 text-white hover:text-[#FF9900] font-semibold text-sm transition-colors border-b border-white/10"
+                        >
+                          <User size={16} />
+                          My Profile
+                        </motion.button>
+
                         <motion.button
                           whileHover={{ backgroundColor: "rgba(255, 153, 0, 0.2)" }}
                           onClick={() => {

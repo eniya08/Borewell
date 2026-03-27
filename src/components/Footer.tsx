@@ -68,7 +68,7 @@ const Footer = () => (
             <div className="flex gap-3">
               <Phone className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-navy-foreground font-semibold">+91 XXXXX XXXXX</p>
+                <p className="text-navy-foreground font-semibold">+91 98424 56101</p>
               </div>
             </div>
             <div className="flex gap-3">
@@ -80,8 +80,8 @@ const Footer = () => (
             <div className="flex gap-3">
               <MapPin className="h-5 w-5 text-secondary flex-shrink-0 mt-0.5" />
               <div>
-                <p>Location, City</p>
-                <p>State - PIN Code</p>
+                <p>Namakkal, Tamil Nadu</p>
+                <p>India</p>
               </div>
             </div>
           </div>

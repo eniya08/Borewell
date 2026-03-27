@@ -15,16 +15,17 @@ import {
   Check,
   Edit,
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface BookingRequest {
-  id: number;
+  id: string | number;
   userName: string;
   email: string;
   phone: string;
   serviceType: string;
   location: string;
   date: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "confirmed" | "cancelled";
 }
 
 interface GalleryImage {
@@ -43,7 +44,7 @@ interface BlogImageData {
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<"overview" | "bookings" | "images" | "gallery" | "settings">(
+  const [activeTab, setActiveTab] = useState<"overview" | "bookings" | "analytics" | "settings">(
     "overview"
   );
 
@@ -54,16 +55,21 @@ const AdminDashboard = () => {
       try {
         const parsed = JSON.parse(storedBookings);
         // Convert fetched bookings to BookingRequest format
-        return parsed.map((booking: any, idx: number) => ({
-          id: idx + 1,
-          userName: booking.name || "User",
-          email: booking.email || "",
-          phone: booking.phone || "",
-          serviceType: booking.serviceType || "General Inquiry",
-          location: booking.location || "",
-          date: booking.date || new Date().toISOString().split('T')[0],
-          status: (booking.status?.toLowerCase() as "pending" | "approved" | "rejected") || "pending",
-        }));
+        return parsed.map((booking: any, idx: number) => {
+          let st = booking.status?.toLowerCase();
+          if (st === "confirmed") st = "confirmed";
+          if (st === "cancelled") st = "cancelled";
+          return {
+            id: booking.id || (idx + 1),
+            userName: booking.name || "User",
+            email: booking.email || "",
+            phone: booking.phone || "",
+            serviceType: booking.serviceType || "General Inquiry",
+            location: booking.location || "",
+            date: booking.date || booking.appointmentDate || new Date().toISOString().split('T')[0],
+            status: (["pending", "confirmed", "cancelled"].includes(st) ? st : "pending") as any,
+          };
+        });
       } catch (error) {
         // If parsing fails, return sample data
         return [
@@ -85,7 +91,7 @@ const AdminDashboard = () => {
             serviceType: "Borewell Cleaning",
             location: "Pune",
             date: "2024-03-18",
-            status: "approved",
+            status: "confirmed",
           },
           {
             id: 3,
@@ -120,7 +126,7 @@ const AdminDashboard = () => {
           serviceType: "Borewell Cleaning",
           location: "Pune",
           date: "2024-03-18",
-          status: "approved",
+          status: "confirmed",
         },
         {
           id: 3,
@@ -181,34 +187,34 @@ const AdminDashboard = () => {
     navigate("/");
   };
 
-  const handleApproveBooking = (id: number) => {
+  const handleApproveBooking = (id: string | number) => {
     const updatedBookings = bookings.map((b) => 
-      b.id === id ? { ...b, status: "approved" as const } : b
+      b.id === id ? { ...b, status: "confirmed" as const } : b
     );
     setBookings(updatedBookings);
     
-    // Update localStorage with approved status
+    // Update localStorage with confirmed status
     const storedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-    const bookingIndex = storedBookings.findIndex((b: any) => b.email === bookings.find(x => x.id === id)?.email);
+    const bookingIndex = storedBookings.findIndex((b: any) => b.id == id);
     if (bookingIndex >= 0) {
-      storedBookings[bookingIndex].status = "approved";
+      storedBookings[bookingIndex].status = "confirmed";
       localStorage.setItem("bookings", JSON.stringify(storedBookings));
     }
     
     setSelectedBooking(null);
   };
 
-  const handleRejectBooking = (id: number) => {
+  const handleRejectBooking = (id: string | number) => {
     const updatedBookings = bookings.map((b) => 
-      b.id === id ? { ...b, status: "rejected" as const } : b
+      b.id === id ? { ...b, status: "cancelled" as const } : b
     );
     setBookings(updatedBookings);
     
-    // Update localStorage with rejected status
+    // Update localStorage with cancelled status
     const storedBookings = JSON.parse(localStorage.getItem("bookings") || "[]");
-    const bookingIndex = storedBookings.findIndex((b: any) => b.email === bookings.find(x => x.id === id)?.email);
+    const bookingIndex = storedBookings.findIndex((b: any) => b.id == id);
     if (bookingIndex >= 0) {
-      storedBookings[bookingIndex].status = "rejected";
+      storedBookings[bookingIndex].status = "cancelled";
       localStorage.setItem("bookings", JSON.stringify(storedBookings));
     }
     
@@ -275,7 +281,7 @@ const AdminDashboard = () => {
   };
 
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
-  const approvedCount = bookings.filter((b) => b.status === "approved").length;
+  const approvedCount = bookings.filter((b) => b.status === "confirmed").length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-20">
@@ -307,8 +313,8 @@ const AdminDashboard = () => {
           {[
             { id: "overview", label: "Overview", icon: BarChart3 },
             { id: "bookings", label: "Bookings", icon: CheckCircle },
-            { id: "images", label: "Image Manager", icon: Image },
-            { id: "gallery", label: "Gallery", icon: Upload },
+            { id: "analytics", label: "Analytics", icon: BarChart3 },
+            
             { id: "settings", label: "Settings", icon: FileText },
           ].map(({ id, label, icon: Icon }) => (
             <button
@@ -354,17 +360,12 @@ const AdminDashboard = () => {
                   icon: Clock,
                 },
                 {
-                  label: "Approved",
+                  label: "Confirmed",
                   value: approvedCount,
                   color: "from-green-500 to-green-600",
                   icon: CheckCircle,
                 },
-                {
-                  label: "Gallery Images",
-                  value: images.length,
-                  color: "from-purple-500 to-purple-600",
-                  icon: Image,
-                },
+                
               ].map((stat, i) => {
                 const Icon = stat.icon;
                 return (
@@ -384,8 +385,36 @@ const AdminDashboard = () => {
               })}
             </div>
 
+            {/* Analytics Chart */}
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6 mt-6">
+              <h3 className="text-lg font-bold text-white mb-4">Bookings by Service</h3>
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={Object.entries(
+                      bookings.reduce((acc, booking) => {
+                        acc[booking.serviceType] = (acc[booking.serviceType] || 0) + 1;
+                        return acc;
+                      }, {} as Record<string, number>)
+                    ).map(([name, count]) => ({ name, count }))}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                    <XAxis dataKey="name" stroke="#ffffff" tick={{ fill: '#ffffff', fontSize: 12 }} />
+                    <YAxis stroke="#ffffff" tick={{ fill: '#ffffff' }} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                      itemStyle={{ color: '#38bdf8' }}
+                      cursor={{ fill: '#ffffff10' }}
+                    />
+                    <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
             {/* Recent Activity */}
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6 mt-6">
               <h3 className="text-lg font-bold text-white mb-4">Recent Bookings</h3>
               <div className="space-y-3">
                 {bookings.slice(0, 3).map((booking) => (
@@ -401,7 +430,7 @@ const AdminDashboard = () => {
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         booking.status === "pending"
                           ? "bg-yellow-500/20 text-yellow-300"
-                          : booking.status === "approved"
+                          : booking.status === "confirmed"
                           ? "bg-green-500/20 text-green-300"
                           : "bg-red-500/20 text-red-300"
                       }`}
@@ -425,7 +454,7 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-white">Booking Requests</h2>
               <div className="flex gap-2">
-                {["pending", "approved"].map((status) => (
+                {["pending", "confirmed"].map((status) => (
                   <div
                     key={status}
                     className="px-4 py-2 bg-white/10 rounded-lg text-sm text-gray-300"
@@ -471,7 +500,7 @@ const AdminDashboard = () => {
                         className={`px-3 py-1 rounded-full text-xs font-semibold ${
                           booking.status === "pending"
                             ? "bg-yellow-500/20 text-yellow-300"
-                            : booking.status === "approved"
+                            : booking.status === "confirmed"
                             ? "bg-green-500/20 text-green-300"
                             : "bg-red-500/20 text-red-300"
                         }`}
@@ -490,199 +519,38 @@ const AdminDashboard = () => {
           </motion.div>
         )}
 
-        {/* Gallery Tab */}
-        {activeTab === "gallery" && (
+                {/* Analytics Tab */}
+        {activeTab === "analytics" && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-white">Gallery Management</h2>
-              <label className="px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg cursor-pointer hover:from-purple-600 hover:to-purple-700 transition-all flex items-center gap-2">
-                <Upload className="w-4 h-4" />
-                Upload Images
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-
-            {uploadError && (
-              <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm">
-                {uploadError}
+            <h2 className="text-2xl font-bold text-white">Analytics Dashboard</h2>
+            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-white mb-4">Bookings by Status</h3>
+              <div className="h-72 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={[
+                      { name: 'Pending', count: pendingCount },
+                      { name: 'Confirmed', count: approvedCount },
+                      { name: 'Cancelled', count: bookings.filter((b) => b.status === "cancelled").length },
+                    ]}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ffffff20" />
+                    <XAxis dataKey="name" stroke="#ffffff" tick={{ fill: '#ffffff', fontSize: 12 }} />
+                    <YAxis stroke="#ffffff" tick={{ fill: '#ffffff' }} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                      itemStyle={{ color: '#8b5cf6' }}
+                      cursor={{ fill: '#ffffff10' }}
+                    />
+                    <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
-            )}
-
-            {/* Images Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {images.map((image) => (
-                <motion.div
-                  key={image.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="group relative rounded-xl overflow-hidden bg-white/5 border border-white/20"
-                >
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => handleDeleteImage(image.id)}
-                      className="p-2 bg-red-500 hover:bg-red-600 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-5 h-5 text-white" />
-                    </button>
-                  </div>
-                  <div className="p-3 bg-white/10">
-                    <p className="text-xs text-gray-300 truncate">{image.alt}</p>
-                    <p className="text-xs text-gray-500">{image.uploadedDate}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Image Manager Tab */}
-        {activeTab === "images" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-2">Blog Post Image Manager</h2>
-              <p className="text-gray-400 text-sm">Edit and update images displayed in blog posts</p>
-            </div>
-
-            {/* Blog Images Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {blogImages.map((blogImage) => (
-                <motion.div
-                  key={blogImage.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl p-6 space-y-4"
-                >
-                  {/* Blog Post Title */}
-                  <h3 className="text-lg font-semibold text-white line-clamp-2">
-                    {blogImage.title}
-                  </h3>
-
-                  {/* Current Image Preview */}
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-gray-300">
-                      Current Image
-                    </label>
-                    <div className="relative h-40 bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                      <img
-                        src={blogImage.currentUrl}
-                        alt={blogImage.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src =
-                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Crect fill='%23333' width='800' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='%23999'%3EImage not available%3C/text%3E%3C/svg%3E";
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Edit Mode Toggle */}
-                  {editingBlogId === blogImage.id ? (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="space-y-3 pt-4 border-t border-white/10"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                          New Image URL
-                        </label>
-                        <input
-                          type="text"
-                          value={blogImage.newUrl}
-                          onChange={(e) => {
-                            setBlogImages(
-                              blogImages.map((img) =>
-                                img.id === blogImage.id
-                                  ? { ...img, newUrl: e.target.value }
-                                  : img
-                              )
-                            );
-                          }}
-                          placeholder="Enter image URL (e.g., https://unsplash.com/...)"
-                          className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors"
-                        />
-                      </div>
-
-                      {/* URL Preview */}
-                      {blogImage.newUrl && (
-                        <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-300">
-                            URL Preview
-                          </label>
-                          <div className="relative h-32 bg-white/5 rounded-lg overflow-hidden border border-white/10">
-                            <img
-                              src={blogImage.newUrl}
-                              alt="Preview"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src =
-                                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Crect fill='%23333' width='800' height='500'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='%23999'%3EInvalid URL or failed to load%3C/text%3E%3C/svg%3E";
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleUpdateBlogImage(blogImage.id)}
-                          className="flex-1 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-lg transition-all flex items-center justify-center gap-2 font-medium"
-                        >
-                          <Check className="w-4 h-4" />
-                          Update
-                        </button>
-                        <button
-                          onClick={() => handleRevertBlogImage(blogImage.id)}
-                          className="flex-1 px-4 py-2 bg-gray-500/20 hover:bg-gray-500/30 text-gray-300 rounded-lg transition-all flex items-center justify-center gap-2 font-medium"
-                        >
-                          <X className="w-4 h-4" />
-                          Cancel
-                        </button>
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <button
-                      onClick={() => setEditingBlogId(blogImage.id)}
-                      className="w-full px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg transition-all flex items-center justify-center gap-2 font-medium"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Edit Image URL
-                    </button>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Info Box */}
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
-              <p className="text-sm text-blue-200">
-                💡 <strong>Tip:</strong> You can use Unsplash URLs with quality parameters like{" "}
-                <code className="bg-black/30 px-2 py-1 rounded text-xs">
-                  ?w=800&h=500&fit=crop&q=80
-                </code>{" "}
-                for optimal image loading.
-              </p>
             </div>
           </motion.div>
         )}
@@ -757,7 +625,7 @@ const AdminDashboard = () => {
                       className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         selectedBooking.status === "pending"
                           ? "bg-yellow-500/20 text-yellow-300"
-                          : selectedBooking.status === "approved"
+                          : selectedBooking.status === "confirmed"
                           ? "bg-green-500/20 text-green-300"
                           : "bg-red-500/20 text-red-300"
                       }`}

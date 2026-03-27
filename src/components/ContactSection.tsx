@@ -122,21 +122,32 @@ const ContactSection = () => {
               ))}
             </div>
 
-            <a
-              href={`https://wa.me/919842456101?text=${encodeURIComponent("Hi, I'm interested in your borewell services.")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-green-700 transition-colors"
-            >
-              <MessageCircle className="h-5 w-5" />
-              Chat on WhatsApp
-            </a>
+            <div className="flex gap-3">
+              <a
+                href={`https://wa.me/919842456101?text=${encodeURIComponent("Hi, I'm interested in your borewell services.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-green-700 transition-colors"
+              >
+                <MessageCircle className="h-5 w-5" />
+                Chat on WhatsApp
+              </a>
+              <a
+                href="https://www.google.com/maps/search/1+349+Chetti+Thottam,+Pappinaickenpatti,+Namakkal,+Tamil+Nadu+637003/@11.7205,78.1589,15z"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-primary-foreground hover:bg-blue-700 transition-colors"
+              >
+                <MapPin className="h-5 w-5" />
+                Open in Maps
+              </a>
+            </div>
 
             {/* Map */}
             <div className="rounded-xl overflow-hidden border border-border h-56">
               <iframe
                 title="Mahalakshmi Borewells Location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d497699.9973874144!2d77.35074!3d12.9538477!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1670c9b44e6d%3A0xf8dfc3e8517e4fe0!2sBengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1680000000000!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3915.5862!2d78.1589!3d11.7205!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1ab5c1c1c1c1%3A0x1234567890!2s1%20349%20Chetti%20Thottam%2C%20Pappinaickenpatti%2C%20Namakkal%2C%20Tamil%20Nadu%20637003!5e0!3m2!1sen!2sin!4v1711198800000!5m2!1sen!2sin"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

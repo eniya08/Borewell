@@ -11,6 +11,7 @@ interface BookingFormData {
   date: string;
   time: string;
   location: string;
+  depth: string;
   description: string;
 }
 
@@ -25,7 +26,7 @@ export default function BookingPage() {
     const userLoggedIn = localStorage.getItem("userLoggedIn");
     if (!userLoggedIn) {
       setCheckingAuth(false);
-      navigate("/user-signin");
+      navigate("/user-signin", { replace: true, state: { redirectTo: "/booking" } });
       return;
     }
     setIsAuthenticated(true);
@@ -44,6 +45,7 @@ export default function BookingPage() {
     date: '',
     time: '',
     location: '',
+    depth: '',
     description: '',
   });
   const [submitted, setSubmitted] = useState(false);
@@ -69,7 +71,7 @@ export default function BookingPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Verify user is still authenticated before submitting
@@ -82,19 +84,6 @@ export default function BookingPage() {
       return;
     }
     
-    // Verify user has completed signup with valid credentials
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const userExists = registeredUsers.some((u: any) => u.email === userEmail);
-    
-    if (!userExists) {
-      alert('You must complete signup before booking. Redirecting to signup...');
-      localStorage.removeItem("userLoggedIn");
-      localStorage.removeItem("userEmail");
-      localStorage.removeItem("loggedInUser");
-      navigate("/user-signup");
-      return;
-    }
-    
     if (!formData.name || !formData.email || !formData.phone || !formData.date || !formData.time || !formData.location) {
       alert('Please fill all required fields');
       return;
@@ -102,21 +91,23 @@ export default function BookingPage() {
 
     setLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      // Get existing bookings from localStorage
+    try {
+      // Save appointment to localStorage — no backend needed
       const existingBookings = JSON.parse(localStorage.getItem('bookings') || '[]');
-      
-      // Create new booking with unique ID and timestamp
       const newBooking = {
         id: Date.now().toString(),
-        ...formData,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        serviceType: formData.serviceType,
+        appointmentDate: formData.date,
+        appointmentTime: formData.time,
+        location: formData.location,
+        depth: formData.depth,
+        description: `Location: ${formData.location}\nDepth: ${formData.depth}\n${formData.description}`,
         status: 'pending',
         submittedAt: new Date().toLocaleString(),
-        submittedDate: new Date().toISOString()
       };
-      
-      // Add to bookings list
       existingBookings.push(newBooking);
       localStorage.setItem('bookings', JSON.stringify(existingBookings));
       
@@ -127,7 +118,10 @@ export default function BookingPage() {
       setTimeout(() => {
         navigate('/');
       }, 3000);
-    }, 1500);
+    } catch (error) {
+      setLoading(false);
+      alert(error instanceof Error ? error.message : 'Failed to create appointment. Please try again.');
+    }
   };
 
   if (submitted) {
@@ -336,7 +330,7 @@ export default function BookingPage() {
                 </motion.div>
 
                 {/* Location */}
-                <motion.div className="md:col-span-2">
+                <motion.div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
                     <MapPin size={16} className="inline mr-2" />
                     Service Location *
@@ -349,6 +343,22 @@ export default function BookingPage() {
                     placeholder="Enter your complete address"
                     className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
                     required
+                  />
+                </motion.div>
+
+                {/* Depth */}
+                <motion.div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    <Droplet size={16} className="inline mr-2" />
+                    Depth (if provided)
+                  </label>
+                  <input
+                    type="text"
+                    name="depth"
+                    value={formData.depth}
+                    onChange={handleChange}
+                    placeholder="e.g. 500ft"
+                    className="w-full bg-slate-700/50 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition"
                   />
                 </motion.div>
               </div>
